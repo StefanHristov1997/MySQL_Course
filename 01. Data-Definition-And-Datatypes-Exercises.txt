@@ -1,0 +1,282 @@
+1.
+CREATE TABLE `minions`(
+id INT PRIMARY KEY AUTO_INCREMENT,
+name VARCHAR(255) NOT NULL,
+age INT NOT NULL
+);
+
+CREATE TABLE `towns`(
+town_id INT PRIMARY KEY AUTO_INCREMENT,
+name VARCHAR(255) NOT NULL
+);
+
+2.
+ALTER TABLE `minions`
+ADD COLUMN `town_id` INT NOT NULL,
+ADD CONSTRAINT fk_minions_towns
+FOREIGN KEY (`town_id`)
+REFERENCES `towns` (`id`);
+
+3.
+INSERT INTO `towns` (id, name)
+VALUES (1, "Sofia"),
+(2, "Plovdiv"),
+(3, "Varna");
+
+INSERT INTO `minions` (id, name, age, town_id)
+VALUES (1, "Kevin", 22, 1),
+(2, "Bob", 15, 3),
+(3, "Steward", NULL, 2);
+
+4.
+TRUNCATE TABLE `minions`;
+
+5.
+DROP TABLE `minions`;
+DROP TABLE `towns`;
+
+6.
+CREATE TABLE `people`(
+id INT PRIMARY KEY AUTO_INCREMENT,
+name VARCHAR(200) NOT NULL,
+picture BLOB,
+height DOUBLE(2,2),
+weight DOUBLE (2,2),
+gender CHAR NOT NULL,
+birthdate INT NOT NULL,
+biography TEXT
+);
+
+INSERT INTO `people` (id, name, gender, birthdate)
+VALUES (1, "Stefan","m",14),
+(2, "Mitko" ,"m", 15),
+(3, "Krasi", "m", 18),
+(4, "Vladi", "m", 20),
+(5, "Misho", "m", 1);
+
+7.
+CREATE TABLE `users`(
+id INT PRIMARY KEY AUTO_INCREMENT,
+username VARCHAR(30) NOT NULL,
+password VARCHAR(26) NOT NULL,
+profile_picture TINYBLOB,
+last_login_time DATETIME,
+is_deleted BOOLEAN
+);
+
+INSERT INTO `users` (id, username, password)
+VALUES (1, "Toncho", "1234"),
+(2, "Mitko", "absd23"),
+(3, "Pesho", "absd21233"),
+(4, "Gancho", "absd2wewqeewq3"),
+(5, "Ginka", "absd2asdsas3");
+
+8.
+ALTER TABLE `users`
+DROP PRIMARY KEY,
+ADD PRIMARY KEY pk_users (`id`, `username`);
+
+9.
+ALTER TABLE `users`
+MODIFY COLUMN `last_login_time` DATETIME DEFAULT NOW();
+
+10.
+ALTER TABLE `users`
+DROP PRIMARY KEY, 
+ADD CONSTRAINT pk_users
+PRIMARY KEY `users` (`id`),
+MODIFY COLUMN `username` VARCHAR(30) UNIQUE;
+
+11.
+CREATE TABLE `directors` (
+      id INT PRIMARY KEY AUTO_INCREMENT,
+      director_name VARCHAR(30) NOT NULL,
+      notes VARCHAR (50)
+);
+
+CREATE TABLE `genres` (
+	  id INT PRIMARY KEY AUTO_INCREMENT,
+      genre_name VARCHAR(30) NOT NULL,
+      notes VARCHAR(50) 
+);
+
+CREATE TABLE `categories` (
+      id INT PRIMARY KEY AUTO_INCREMENT,
+      category_name VARCHAR(30) NOT NULL,
+      notes VARCHAR(50)
+);
+
+CREATE TABLE `movies` (
+      id INT PRIMARY KEY AUTO_INCREMENT,
+      title VARCHAR(50) NOT NULL,
+      director_id INT,
+      copyright_year DATETIME,
+      length DOUBLE,
+      genre_id INT,
+      category_id INT,
+      rating INT,
+      notes VARCHAR(50)
+);
+
+INSERT INTO `directors` (director_name)
+VALUES ("Stefan"),
+("Bojidar"),
+("Venci"),
+("Vladislav"),
+("Denis");
+
+INSERT INTO `genres` (genre_name)
+VALUES ("Bojidar"),
+("Bobi"),
+("Kristiqn"),
+("Maik"),
+("Aleks");
+
+INSERT INTO `categories` (category_name)
+VALUES ("Horror"),
+("Ection"),
+("Drama"),
+("Romantic"),
+("Triller");
+
+INSERT INTO `movies` (title)
+VALUES ("Titanic"),
+("Die hard"),
+("Game of Thrones"),
+("Hobbit"),
+("Indiana Jhones");
+
+12.
+CREATE TABLE `categories`(
+id INT PRIMARY KEY AUTO_INCREMENT,
+category VARCHAR(50) NOT NULL,
+daily_rate INT,
+weekly_rate INT,
+monthly_rate INT,
+weekend_rate INT
+);
+
+INSERT INTO `categories` (category)
+VALUES ("Van"),
+("Bus"),
+("CityCar");
+
+CREATE TABLE `cars` (
+id INT PRIMARY KEY AUTO_INCREMENT,
+plate_number INT NOT NULL,
+make VARCHAR(50) NOT NULL,
+model VARCHAR(50) NOT NULL,
+car_year INT NOT NULL,
+category_id INT,
+doors INT,
+picture TINYBLOB,
+car_condition VARCHAR(50),
+available BOOLEAN
+);
+
+INSERT INTO `cars` (plate_number, make, model, car_year)
+VALUES (3, "China", "Suzuki", 2001),
+(5, "Bulgaria", "Vaz", 2002),
+(10, "Germany", "Audi", 2013);
+
+
+CREATE TABLE `employees` (
+id INT PRIMARY KEY AUTO_INCREMENT,
+first_name VARCHAR(50) NOT NULL,
+last_name VARCHAR(50) NOT NULL,
+title VARCHAR(50),
+notes VARCHAR(50)
+);
+
+INSERT INTO `employees` (first_name, last_name)
+VALUES ("Stefan", "Hristov"),
+("Vladislav", "Panev"),
+("Krasimir", "Gradevski");
+
+CREATE TABLE `customers` (
+id INT PRIMARY KEY AUTO_INCREMENT,
+driver_license ENUM("YES", "NO") NOT NULL,
+full_name VARCHAR(50) NOT NULL,
+adress VARCHAR(100),
+city VARCHAR(50),
+zip_code INT,
+notes TEXT
+);
+
+INSERT INTO `customers` (driver_license, full_name)
+VALUES ("YES", "Stefan Hristov"),
+("NO", "Milen Gaidarski"),
+("YES", "Vladislav Panev");
+
+CREATE TABLE `rental_orders` (
+id INT PRIMARY KEY AUTO_INCREMENT,
+employee_id INT NOT NULL,
+customer_id INT NOT NULL,
+car_id INT NOT NULL,
+car_condition VARCHAR(50),
+tank_level VARCHAR(50),
+kilometrage_start INT,
+kilometrage_end INT,
+total_kilometrage INT,
+start_date DATETIME,
+end_date DATETIME,
+total_days INT,
+rate_applied ENUM ("yes", "no"),
+tax_rate INT,
+order_status VARChAR(50),
+notes TEXT
+);
+
+INSERT INTO `rental_orders`(employee_id, customer_id, car_id)
+VALUES (2, 3, 4),
+(1,3,5),
+(5, 2, 1);
+
+13.
+INSERT INTO `towns` (`name`)
+VALUES ("Sofia"), ("Plovdiv"), ("Varna"), ("Burgas");
+ 
+INSERT INTO `departments` (`name`)
+VALUES ("Engineering"), ("Sales"), ("Marketing"), ("Software Development"), ("Quality Assurance");
+ 
+ 
+INSERT INTO `employees` (`first_name`, `middle_name`, `last_name`, `job_title`, `department_id`, `hire_date`, `salary`)
+VALUES
+('Ivan', 'Ivanov', 'Ivanov', '.NET Developer', 4, '2013-02-01', 3500.00),
+('Petar', 'Petrov', 'Petrov', 'Senior Engineer', 1, '2004-03-02', 4000.00),
+('Maria', 'Petrova', 'Ivanova', 'Intern', 5, '2016-08-28', 525.25),
+('Georgi', 'Terziev', 'Ivanov', 'CEO', 2, '2007-12-09', 3000.00),
+('Peter', 'Pan', 'Pan', 'Intern', 3, '2016-08-28', 599.88);
+
+14.
+SELECT  * FROM `towns`;
+
+SELECT * FROM `departments`;
+
+SELECT * FROM `employees`;
+
+15.
+SELECT * FROM `towns`
+ORDER BY `name`;
+
+SELECT * FROM `departments`
+ORDER BY `name`;
+
+SELECT * FROM `employees`
+ORDER BY `salary` DESC;
+
+16.
+SELECT `name` FROM `towns`
+ORDER BY `name`;
+
+SELECT `name` FROM `departments`
+ORDER BY `name`;
+
+SELECT `first_name`, `last_name`, `job_title`, `salary` FROM `employees`
+ORDER BY `salary` DESC;
+
+17.
+UPDATE `employees`
+SET `salary` = `salary` * 1.10;
+SELECT `salary` FROM `employees`;
+
