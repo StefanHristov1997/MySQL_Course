@@ -1,0 +1,23 @@
+1. Count Employees by Town
+CREATE FUNCTION `ufn_count_employees_by_town`(town_name VARCHAR(20))
+RETURNS INT
+DETERMINISTIC
+BEGIN
+      DECLARE  count_employees_by_town INT;
+      SET count_employees_by_town := (SELECT COUNT(`employee_id`) FROM `employees` AS e 
+      JOIN `addresses` AS a ON e.`address_id` = a.`address_id`
+      JOIN `towns` AS t ON a.`town_id` = t.`town_id`
+      WHERE t.`name` = town_name);
+      
+      RETURN count_employees_by_town;
+END
+
+2. Employees Promotion
+CREATE PROCEDURE `usp_raise_salaries`(department_name VARCHAR(50))
+BEGIN
+UPDATE `employees` AS e
+        JOIN `departments` AS d ON e.`department_id` = d.`department_id`
+        SET `salary` = `salary` * 1.05
+        WHERE d.`name` = department_name;
+END
+
