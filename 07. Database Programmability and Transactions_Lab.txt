@@ -21,3 +21,39 @@ UPDATE `employees` AS e
         WHERE d.`name` = department_name;
 END
 
+3. Employees Promotion By ID
+CREATE PROCEDURE `usp_raise_salary_by_id`(id INT)
+BEGIN
+ DECLARE `count_id` INT;
+ SET `count_id` = (SELECT COUNT(*) FROM `employees` WHERE `employee_id` = id);
+ START TRANSACTION;
+ IF (`count_id` < 1) THEN
+ ROLLBACK;
+ ELSE 
+ UPDATE `employees`
+ SET `salary` = `salary` * 1.05
+ WHERE `employee_id` = id;
+ END IF;
+END
+
+4. Triggered
+CREATE TABLE `deleted_employees`(
+ `employee_id` int(10) PRIMARY KEY AUTO_INCREMENT,
+  `first_name` varchar(50) NOT NULL,
+  `last_name` varchar(50) NOT NULL,
+  `middle_name` varchar(50) DEFAULT NULL,
+  `job_title` varchar(50) NOT NULL,
+  `department_id` int(10) NOT NULL,
+  `salary` decimal(19,4) NOT NULL
+);
+
+CREATE TRIGGER `deleted_employees_arhiv` 
+AFTER DELETE
+ON `employees`
+FOR EACH ROW
+BEGIN
+ INSERT INTO `deleted_employees` (first_name,last_name,
+ middle_name,job_title,department_id,salary)
+VALUES(OLD.first_name,OLD.last_name,OLD.middle_name,
+ OLD.job_title,OLD.department_id,OLD.salary);
+END
