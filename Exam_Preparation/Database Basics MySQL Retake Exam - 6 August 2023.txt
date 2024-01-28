@@ -126,3 +126,25 @@ ORDER BY `count` DESC, `bank_name`;
 FROM
     `properties`
 ORDER BY `area`, `address` DESC;
+
+10. Offers count in a city
+CREATE FUNCTION udf_offers_from_city_name (cityName VARCHAR(50))
+RETURNS INT 
+DETERMINISTIC
+BEGIN
+		DECLARE count_city_offers INT;
+        SET count_city_offers := (SELECT COUNT(`property_id`) FROM `property_offers` AS po
+								  JOIN `properties` AS p ON po.`property_id` = p.`id`
+                                  JOIN `cities` AS c ON p.`city_id` = c.`id`
+                                  WHERE c.`name` = cityName);
+     RETURN count_city_offers;
+END;
+
+11. Special Offer
+CREATE PROCEDURE udp_special_offer(first_name VARCHAR(50))
+BEGIN
+        UPDATE `property_offers` AS po
+        JOIN `agents` AS a ON po.`agent_id` = a.`id`
+        SET po.`price` = po.`price` * 0.90
+        WHERE a.`first_name` = first_name;
+END;
