@@ -109,5 +109,28 @@ SELECT `flight_code`, `departure`,
  FROM `flights`
  ORDER BY `flight_code` DESC;
 
-​
+​​10. Number of flights
+CREATE FUNCTION udf_count_flights_from_country(country VARCHAR(50))
+RETURNS INT
+DETERMINISTIC
+BEGIN 
+         DECLARE count_flights_from_country INT;
+         SET count_flights_from_country := (SELECT COUNT(`id`) FROM `flights`
+                                            WHERE `departure_country` = (SELECT `id` FROM `countries`
+                                                                         WHERE `name` = country));
+                                            
+	RETURN count_flights_from_country;
+END;
+
+11. Delay flight
+CREATE PROCEDURE udp_delay_flight(flight_code VARCHAR(50))
+BEGIN 
+      UPDATE `flights`
+      SET `has_delay` = 1 
+      WHERE `flight_code` = flight_code;
+      
+      UPDATE `flights`
+      SET `departure` = ADDTIME(`departure`, "00:30:00")
+      WHERE `flight_code` = flight_code;
+END;
 ​
