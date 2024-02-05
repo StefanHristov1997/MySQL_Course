@@ -82,3 +82,61 @@ DELETE w FROM `waiters` AS w
 LEFT JOIN `orders` AS o ON o.`waiter_id` = w.`id`
 WHERE o.`waiter_id` IS NULL;
 
+05. Clients
+SELECT * FROM `clients`
+ORDER BY `birthdate` DESC, `id` DESC;
+
+06. Birthdate
+SELECT `first_name`, `last_name`, `birthdate`, `review` FROM `clients`
+WHERE `card` IS NULL AND YEAR(`birthdate`) BETWEEN (1978) AND (1993)
+ORDER BY `last_name` DESC, `id`
+LIMIT 5;
+
+07. Accounts
+SELECT CONCAT(`last_name`, `first_name`, char_length(`first_name`), 'Restaurant') AS `username`,REVERSE(SUBSTRING(`email`, 2, 12)) AS `password`
+FROM `waiters`
+WHERE `salary` is NOT NULL
+ORDER BY `password` DESC;
+
+08. Top from menu
+SELECT `id`, `name`, COUNT(p.`name`) AS `count` FROM `products` AS p
+JOIN `orders_products` AS op ON op.`product_id` = p.`id`
+GROUP BY op.`product_id`
+HAVING `count` >= 5
+ORDER BY `count` DESC, p.`name`;
+
+09. Availability
+SELECT o.`table_id`, t.`capacity`, COUNT(oc.`client_id`) AS `count_clients`,
+(CASE WHEN `capacity` >  COUNT(oc.`client_id`) THEN 'Free seats'
+      WHEN `capacity` =  COUNT(oc.`client_id`) THEN 'Full'
+      WHEN `capacity` <  COUNT(oc.`client_id`) THEN 'Extra seats'
+ END) AS `availability` 
+FROM `orders_clients` AS oc
+JOIN `orders` AS o ON oc.`order_id` = o.`id`
+JOIN `tables` AS t ON t.`id` = o.`table_id`
+WHERE t.`floor` = 1
+GROUP BY o.`table_id`
+ORDER BY `table_id` DESC;
+
+10. Extract bill
+CREATE FUNCTION udf_client_bill (full_name VARCHAR(50)) 
+RETURNS DECIMAL(19, 2)
+DETERMINISTIC
+BEGIN
+             DECLARE client_bill DECIMAL(19,2);
+             SET client_bill :=  (SELECT SUM(p.`price`) FROM `products` AS p
+                                 JOIN `orders_products` AS op ON op.`product_id` = p.`id`
+                                 JOIN `orders_clients` AS oc ON op.`order_id` = oc.`order_id`
+                                 JOIN `clients` AS c ON oc.`client_id` = c.`id`
+                                 WHERE CONCAT_WS(' ', c.`first_name`, c.`last_name`) = full_name);
+                                 
+		     RETURN client_bill;
+END;
+
+11. Happy hour
+CREATE PROCEDURE udp_happy_hour(type VARCHAR(50))
+BEGIN 
+     UPDATE `products`
+     SET `price` = `price` * 0.80
+     WHERE `price` >= 10.00 AND `type` = type;
+END;
