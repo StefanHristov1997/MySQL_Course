@@ -100,4 +100,59 @@ WHERE YEAR(ma.`release_date`) BETWEEN (1996) AND (1999)
 ORDER BY ma.`runtime`,ma.`id`
 LIMIT 20;
 
-​
+​07. Movie casting
+SELECT CONCAT_WS(' ', `first_name`, `last_name`) AS `full_name`, CONCAT(REVERSE(`last_name`), CHAR_LENGTH(`last_name`), '@cast.com') AS `email`,
+2022 - YEAR(`birthdate`) AS `age`, `height` FROM `actors` AS a
+LEFT JOIN `movies_actors` AS ma ON ma.`actor_id` = a.`id`
+WHERE ma.`actor_id` IS NULL
+ORDER BY `height`;
+
+08. International festival
+SELECT c.`name`, COUNT(m.`id`) AS `movies_count` FROM `countries` AS c
+JOIN `movies` AS m ON m.`country_id` = c.`id`
+GROUP BY c.`name`
+HAVING `movies_count` >= 7
+ORDER BY c.`name` DESC;
+
+09. Rating system
+SELECT 
+    m.`title`,
+    (CASE
+        WHEN ma.`rating` <= 4 THEN 'poor'
+        WHEN ma.`rating` <= 7 THEN 'good'
+        ELSE 'excellent'
+    END) AS `rating`,
+    IF(ma.`has_subtitles` = 1,
+        'english',
+        '-') AS `subtitles`,
+    ma.`budget`
+FROM
+    `movies` AS m
+        JOIN
+    `movies_additional_info` AS ma ON m.`movie_info_id` = ma.`id`
+ORDER BY ma.`budget` DESC;
+
+10. History movies
+CREATE FUNCTION udf_actor_history_movies_count(full_name VARCHAR(50))
+RETURNS INT
+DETERMINISTIC
+BEGIN
+        DECLARE count_history_movies INT;
+        SET count_history_movies := (SELECT COUNT(gm.`movie_id`) FROM `genres_movies` AS gm
+				     JOIN `genres` AS g ON gm.`genre_id` = g.`id`
+                                     JOIN `movies_actors` AS ma ON ma.`movie_id` = gm.`movie_id`
+                                     JOIN `actors` AS a ON ma.`actor_id` = a.`id`
+                                     WHERE (CONCAT_WS(' ', a.`first_name`, a.`last_name`) = full_name) AND (g.`name` = 'History'));
+	
+        RETURN count_history_movies;
+END;
+
+11. Movie awards
+CREATE PROCEDURE udp_award_movie (movie_title VARCHAR(50))
+BEGIN
+       UPDATE `actors` AS a
+       JOIN `movies_actors` AS ma ON ma.`actor_id` = a.`id`
+       JOIN `movies` AS m  ON ma.`movie_id` = m.`id`
+       SET a.`awards` = `awards` + 1
+       WHERE m.`title` = movie_title;
+END;
